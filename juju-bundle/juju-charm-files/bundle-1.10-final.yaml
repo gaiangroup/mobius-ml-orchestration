@@ -1,0 +1,364 @@
+bundle: kubernetes
+name: kubeflow
+docs: "https://discourse.charmhub.io/t/18106"
+applications:
+  admission-webhook:
+    charm: ./admission-webhook_r467.charm
+    resources:
+      oci-image: "gaianmobius/admission-webhook:1.10.0-8dd1032"
+    trust: true
+    scale: 1
+  argo-controller:
+    charm: ./argo-controller_r818.charm
+    trust: true
+    scale: 1
+    resources:
+      oci-image: "gaianmobius/workflow-controller:3.5.14-ee1fda3"
+    options:
+      executor-image: "gaianmobius/argoexec:3.5.14-9761df4"    
+  dex-auth:
+    charm: ./dex-auth_r699.charm
+    scale: 1
+    trust: true
+    resources:
+      oci-image: "gaianmobius/dex:2.41.1-1d3fe19"
+  envoy:
+    charm: ./envoy_r406.charm
+    scale: 1
+    trust: true
+    resources:
+      oci-image: "gaianmobius/envoy:1.28.2"
+  istio-ingressgateway:
+    charm: ./istio-gateway_r1474.charm
+    scale: 1
+    trust: true
+    options:
+      kind: ingress
+      proxy-image: "gaianmobius/proxyv2:1.24.2"
+  istio-pilot:
+    charm: ./istio-pilot_r1417.charm
+    scale: 1
+    trust: true
+    options:
+      image-configuration: |
+        pilot-image: 'pilot'  # values.pilot.image
+        global-tag: '1.24.2'  # values.global.tag
+        global-hub: 'gaianmobius' # values.global.hub
+        global-proxy-image: 'proxyv2' # values.global.proxy.image
+        global-proxy-init-image: 'proxyv2' # values.global.proxy_init.image
+        grpc-bootstrap-init: 'gaianmobius/busybox:1.28'
+  jupyter-controller:
+    charm: ./jupyter-controller_r1301.charm
+    scale: 1
+    trust: true
+    resources:
+      oci-image: "gaianmobius/notebook-controller:1.10.0-ef1fc67"
+  jupyter-ui:
+    charm: ./jupyter-ui_r1298.charm
+    scale: 1
+    trust: true
+    resources:
+      oci-image: "gaianmobius/jupyter-web-app:1.10.0-ef1fc67"
+    options:
+      jupyter-images: |
+        - gaianmobius/jupyter-scipy:1.10.0-0be57a5
+        - gaianmobius/jupyter-pytorch-full:v1.10.0-4cbdf49
+        - gaianmobius/jupyter-pytorch-cuda-full:v1.10.0-rc.1
+        - gaianmobius/jupyter-pytorch-gaudi-full:v1.10.0-rc.1
+        - gaianmobius/jupyter-tensorflow-full:1.10.0-448e378
+        - gaianmobius/jupyter-tensorflow-cuda-full:v1.10.0-rc.1
+        - gaianmobius/codeserver-python:1.10.0-55dcdeb
+        - gaianmobius/rstudio-tidyverse:v1.10.0-9a7bded          
+  katib-controller:
+    charm: ./katib-controller_r1163.charm
+    scale: 1
+    resources:
+      oci-image: "gaianmobius/katib-controller:v0.18.0-d73ff5e"
+    trust: true
+    options:
+      custom_images: |
+        {
+          "default_trial_template": "gaianmobius/ubuntu:22.04",
+          "default_trial_template_enas": "gaianmobius/enas-cnn-cifar10-cpu:v0.18.0",
+          "default_trial_template_pytorch": "gaianmobius/pytorch-mnist-cpu:v0.18.0",
+          "early_stopping__medianstop": "gaianmobius/earlystopping-medianstop:v0.18.0-d73ff5e",
+          "metrics_collector_sidecar__stdout": "gaianmobius/file-metrics-collector:v0.18.0",
+          "metrics_collector_sidecar__file": "gaianmobius/file-metrics-collector:v0.18.0",
+          "metrics_collector_sidecar__tensorflow_event": "gaianmobius/tfevent-metrics-collector:v0.18.0",
+          "suggestion__random": "gaianmobius/suggestion-hyperopt:v0.18.0-d73ff5e",
+          "suggestion__tpe": "gaianmobius/suggestion-hyperopt:v0.18.0-d73ff5e",
+          "suggestion__grid": "gaianmobius/suggestion-optuna:v0.18.0-d73ff5e",
+          "suggestion__hyperband": "gaianmobius/suggestion-hyperband:v0.18.0-d73ff5e",
+          "suggestion__bayesianoptimization": "gaianmobius/suggestion-skopt:v0.18.0-d73ff5e",
+          "suggestion__cmaes": "gaianmobius/suggestion-goptuna:v0.18.0-d73ff5e",
+          "suggestion__sobol": "gaianmobius/suggestion-goptuna:v0.18.0-d73ff5e",
+          "suggestion__multivariate_tpe": "gaianmobius/suggestion-optuna:v0.18.0-d73ff5e",
+          "suggestion__enas": "gaianmobius/suggestion-enas:v0.18.0-d73ff5e",
+          "suggestion__darts": "gaianmobius/suggestion-nas-darts:v0.18.0-d73ff5e",
+          "suggestion__pbt": "gaianmobius/suggestion-pbt:v0.18.0-d73ff5e"
+        }
+  katib-db:
+    charm: ./mysql-k8s_r343.charm
+    scale: 1
+    trust: true
+    constraints: mem=2G 
+    resources:
+      mysql-image: "gaianmobius/charmed-mysql:8.0"
+  katib-db-manager:
+    charm: ./katib-db-manager_r1123.charm
+    scale: 1
+    trust: true
+    resources:
+      oci-image: "gaianmobius/katib-db-manager:v0.18.0-d73ff5e"
+  katib-ui:
+    charm: ./katib-ui_r1122.charm
+    scale: 1
+    trust: true
+    resources:
+      oci-image: "gaianmobius/katib-ui:v0.18.0-d73ff5e"
+  kfp-api:
+    charm: ./kfp-api_r2240.charm
+    scale: 1
+    trust: true
+    resources:
+      oci-image: "gaianmobius/api-server:2.5.0-d7e9bcb"
+    options:
+      launcher-image: gaianmobius/kfp-launcher:2.5.0-e91327e
+      driver-image: gaianmobius/kfp-driver:2.5.0-1c1a3c7 
+  kfp-db:
+    charm: ./mysql-k8s_r343.charm
+    scale: 1
+    trust: true
+    constraints: mem=2G
+    resources:
+      mysql-image: "gaianmobius/charmed-mysql:8.0"
+  kfp-metadata-writer:
+    charm: ./kfp-metadata-writer_r1310.charm
+    scale: 1
+    trust: true
+    resources:
+      oci-image: "gaianmobius/metadata-writer:2.5.0-4df6e48"
+  kfp-persistence:
+    charm: ./kfp-persistence_r2251.charm
+    scale: 1
+    trust: true
+    resources:
+      oci-image: "gaianmobius/persistenceagent:2.5.0-6c4bc85"
+  kfp-profile-controller:
+    charm: ./kfp-profile-controller_r2211.charm
+    scale: 1
+    trust: true
+    resources:
+      oci-image: "gaianmobius/python:3.12-24.04_stable"
+    options:
+      custom_images: |
+        {
+          "visualization_server": "gaianmobius/visualization-server:2.5.0-400719c",
+          "frontend": "gaianmobius/frontend:2.5.0-308f3e0"
+        }
+  kfp-schedwf:
+    charm: ./kfp-schedwf_r2261.charm
+    scale: 1
+    trust: true
+    resources:
+      oci-image: "gaianmobius/scheduledworkflow:2.5.0-2157ffb"
+  kfp-ui:
+    charm: ./kfp-ui_r2253.charm
+    scale: 1
+    trust: true
+    resources:
+      ml-pipeline-ui: "gaianmobius/frontend:2.5.0-308f3e0"
+  kfp-viewer:
+    charm: ./kfp-viewer_r2281.charm
+    scale: 1
+    trust: true
+    resources:
+      kfp-viewer-image: "gaianmobius/viewer-crd-controller:2.5.0-70deeb9"
+  kfp-viz:
+    charm: ./kfp-viz_r2197.charm
+    scale: 1
+    trust: true
+    resources:
+      oci-image: "gaianmobius/visualization-server:2.5.0-400719c"
+  knative-eventing:
+    charm: ./knative-eventing_r866.charm
+    scale: 1
+    trust: true
+    options:
+      namespace: knative-eventing
+      custom_images: |
+        {
+          "eventing-controller/eventing-controller": "gaianmobius/knative-eventing-controller:1.16.1-9ce84dd",
+          "eventing-webhook/eventing-webhook": "gaianmobius/knative-eventing-webhook:1.16.1-41d35c3",
+          "imc-controller/controller": "gaianmobius/knative-eventing-channel-controller:1.16.1-a297268",
+          "imc-dispatcher/dispatcher": "gaianmobius/knative-eventing-channel-dispatcher:1.16.1-ada58f5",
+          "mt-broker-controller/mt-broker-controller": "gaianmobius/knative-eventing-mtchannel-broker:1.16.1-b727068",
+          "mt-broker-filter/filter": "gaianmobius/knative-eventing-broker-filter:1.16.1-38d9fc1",
+          "mt-broker-ingress/ingress": "gaianmobius/knative-eventing-broker-ingress:1.16.1-f046888",
+          "pingsource-mt-adapter/dispatcher": "gaianmobius/knative-eventing-mtping:1.16.1-d5773f7"
+        }
+  knative-operator:
+    charm: ./knative-operator_r827.charm
+    scale: 1
+    trust: true
+    resources:
+      knative-operator-image: "gaianmobius/knative-operator:1.16.0-7e998f4"
+      knative-operator-webhook-image: "gaianmobius/knative-webhook:1.16.0-f82a64b"
+    options:
+      otel-collector-image: gaianmobius/opentelemetry-collector:0.120.0-24.04_stable    
+  knative-serving:
+    charm: ./knative-serving_r865.charm
+    scale: 1
+    trust: true
+    options:
+      namespace: knative-serving
+      custom_images: |
+        {
+          "activator": "gaianmobius/knative-serving-activator:1.16.0-2a3354f",
+          "autoscaler": "gaianmobius/knative-serving-autoscaler:1.16.0-be87e8e",
+          "controller": "gaianmobius/knative-serving-controller:1.16.0-2596560",
+          "webhook": "gaianmobius/knative-serving-webhook:1.16.0-692cdbd",
+          "autoscaler-hpa": "gaianmobius/knative-serving-autoscaler-hpa:1.16.0-9f36110",
+          "net-istio-controller/controller": "gaianmobius/net-istio-controller:1.16.0-2ac1bad",
+          "net-istio-webhook/webhook": "gaianmobius/net-istio-webhook:1.16.0-4214206",
+          "queue-proxy": "gaianmobius/knative-serving-queue:1.16.0-18b14c8",
+          "migrate": "gaianmobius/migrate:1.16.0-36e94d5"
+        }
+  kserve-controller:
+    charm: ./kserve-controller_r951.charm
+    scale: 1
+    trust: true
+    resources:
+      kserve-controller-image: "gaianmobius/kserve-controller:0.14.1-19f8d3d"
+    options:
+      deployment-mode: serverless
+      custom_images: |
+        {
+          "configmap__agent": "gaianmobius/kserve-agent:0.14.1-0fb8a34",
+          "configmap__batcher": "gaianmobius/kserve-agent:0.14.1-0fb8a34",
+          "configmap__explainers__art": "gaianmobius/artexplainer:0.14.1-8ace842",
+          "configmap__logger": "gaianmobius/kserve-agent:0.14.1-0fb8a34",
+          "configmap__router": "gaianmobius/kserve-router:0.14.1-35ac068",
+          "configmap__storageInitializer": "gaianmobius/storage-initializer:0.14.1-397d028",
+          "serving_runtimes__huggingfaceserver": "gaianmobius/huggingfaceserver:0.14.1-790009b",
+          "serving_runtimes__lgbserver": "gaianmobius/lgbserver:0.14.1-537653b",
+          "serving_runtimes__kserve_mlserver": "gaianmobius/mlserver:1.5.0",
+          "serving_runtimes__paddleserver": "gaianmobius/paddleserver:0.14.1-537653b",
+          "serving_runtimes__pmmlserver": "gaianmobius/pmmlserver:0.14.1-bd08793",
+          "serving_runtimes__sklearnserver": "gaianmobius/sklearnserver:0.14.1-685a8e7",
+          "serving_runtimes__tensorflow_serving": "gaianmobius/tensorflow-serving:2.6.2-3f1565f",
+          "serving_runtimes__torchserve": "gaianmobius/torchserve-kfs:0.9.0-19380f0",
+          "serving_runtimes__tritonserver": "gaianmobius/tritonserver:23.05-py3",
+          "serving_runtimes__xgbserver": "gaianmobius/xgbserver:0.14.1-77c46bc"
+        }  
+  kubeflow-dashboard:
+    charm: ./kubeflow-dashboard_r847.charm
+    scale: 1
+    trust: true
+    resources:
+      oci-image: "gaianmobius/centraldashboard:1.10.0-e346d61"
+  kubeflow-profiles:
+    charm: ./kubeflow-profiles_r772.charm
+    scale: 1
+    trust: true
+    resources:
+      profile-image: "gaianmobius/profile-controller:1.10.0-7fcf726"
+      kfam-image: "gaianmobius/kfam:1.10.0-7fcf726"
+  kubeflow-roles:
+    charm: ./kubeflow-roles_r357.charm
+    scale: 1
+    trust: true
+  kubeflow-volumes:
+    charm: ./kubeflow-volumes_r514.charm
+    scale: 1
+    trust: true
+    resources:
+      oci-image: "gaianmobius/volumes-web-app:1.10.0-a526a2e"
+    options:
+      volume-viewer-image: gaianmobius/filebrowser:2.27.0-f21fe9d    
+  metacontroller-operator:
+    charm: ./metacontroller-operator_r510.charm
+    scale: 1
+    trust: true
+    options:  
+      metacontroller-image: gaianmobius/metacontroller:4.11.22-ddba67c  
+  mlmd:
+    charm: ./mlmd_r344.charm
+    scale: 1
+    trust: true
+    resources:
+      oci-image: "gaianmobius/ml-metadata:1.14.0-2a80c7b"
+  minio:
+    charm: ./minio_r617.charm
+    scale: 1
+    resources:
+      oci-image: "gaianmobius/minio:ckf-1.10-b40ac43"
+  oidc-gatekeeper:
+    charm: ./oidc-gatekeeper_r556.charm
+    scale: 1
+    trust: true
+    resources:
+      oci-image: "gaianmobius/oidc-authservice:ckf-1.10-5c30ade"
+  pvcviewer-operator:
+    charm: ./pvcviewer-operator_r368.charm
+    scale: 1
+    trust: true
+    resources:
+      oci-image: "gaianmobius/pvcviewer-controller:1.10.0-09b616f"
+  tensorboard-controller:
+    charm: ./tensorboard-controller_557.charm
+    scale: 1
+    trust: true
+    resources:
+      tensorboard-controller-image: "gaianmobius/tensorboard-controller:1.10.0-43d993e"
+    options:
+      tensorboard-image: gaianmobius/tensorflow:2.5.1-2836bb9    
+  tensorboards-web-app:
+    charm: ./tensorboards-web-app_r543.charm
+    scale: 1
+    trust: true
+    resources:
+      tensorboards-web-app-image: "gaianmobius/tensorboards-web-app:1.10.0-43d993e"
+  training-operator:
+    charm: ./training-operator_r653.charm
+    scale: 1
+    trust: true
+    options:
+      training-operator-image: gaianmobius/training-operator:1.9.3-9e9ea13  
+relations:
+  - [argo-controller, minio]
+  - [dex-auth:dex-oidc-config, oidc-gatekeeper:dex-oidc-config]
+  - [dex-auth:oidc-client, oidc-gatekeeper:oidc-client]
+  - [istio-pilot:ingress, dex-auth:ingress]
+  - [istio-pilot:ingress, jupyter-ui:ingress]
+  - [istio-pilot:ingress, katib-ui:ingress]
+  - [istio-pilot:ingress, kfp-ui:ingress]
+  - [istio-pilot:ingress, kubeflow-dashboard:ingress]
+  - [istio-pilot:ingress, kubeflow-volumes:ingress]
+  - [istio-pilot:ingress, oidc-gatekeeper:ingress]
+  - [istio-pilot:ingress, envoy:ingress]
+  - [istio-pilot:ingress-auth, oidc-gatekeeper:ingress-auth]
+  - [istio-pilot:istio-pilot, istio-ingressgateway:istio-pilot]
+  - [istio-pilot:ingress, tensorboards-web-app:ingress]
+  - [istio-pilot:gateway-info, tensorboard-controller:gateway-info]
+  - [katib-db-manager:k8s-service-info, katib-controller:k8s-service-info]
+  - [katib-db-manager:relational-db, katib-db:database]
+  - [kfp-api:relational-db, kfp-db:database]
+  - [kfp-api:kfp-api, kfp-persistence:kfp-api]
+  - [kfp-api:kfp-api, kfp-ui:kfp-api]
+  - [kfp-api:kfp-viz, kfp-viz:kfp-viz]
+  - [kfp-api:object-storage, minio:object-storage]
+  - [kfp-profile-controller:object-storage, minio:object-storage]
+  - [kfp-ui:object-storage, minio:object-storage]
+  - [kserve-controller:ingress-gateway, istio-pilot:gateway-info]
+  - [kserve-controller:local-gateway, knative-serving:local-gateway]
+  - [kubeflow-profiles, kubeflow-dashboard]
+  - [kubeflow-dashboard:links, jupyter-ui:dashboard-links]
+  - [kubeflow-dashboard:links, katib-ui:dashboard-links]
+  - [kubeflow-dashboard:links, kfp-ui:dashboard-links]
+  - [kubeflow-dashboard:links, kubeflow-volumes:dashboard-links]
+  - [kubeflow-dashboard:links, tensorboards-web-app:dashboard-links]
+  - [kubeflow-dashboard:links, training-operator:dashboard-links]
+  - [mlmd:grpc, envoy:grpc]
+  - [mlmd:grpc, kfp-metadata-writer:grpc]
+
